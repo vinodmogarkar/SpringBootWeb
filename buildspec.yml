@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - $(aws ecr get-login --no-include-email --region us-east-1)
+  build:
+    commands:
+      - docker build -t docker .
+      - docker tag docker:latest public.ecr.aws/j0f1a3f0/docker:latest
+  post_build:
+    commands:
+      - docker push public.ecr.aws/j0f1a3f0/docker:latest
+      - printf '[{"name":helloWorld,"imageUri":"%s"}]' docker:latest public.ecr.aws/j0f1a3f0/docker:latest > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
